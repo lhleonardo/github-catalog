@@ -5,6 +5,9 @@
 /.pnp
 .pnp.js
 
+# credentials
+.env
+
 # testing
 /coverage
 
@@ -21,3 +24,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# não quero package-lock
+package-lock.json
