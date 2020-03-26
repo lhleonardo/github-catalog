@@ -96,9 +96,6 @@ export const Issue = styled.li`
   }
 `;
 
-function invertHex(hex) {
-  return (Number(`0x1${hex}`) ^ 0xffffff).toString(16).substr(1).toUpperCase();
-}
 export const LabelList = styled.ul`
   list-style: none;
 `;
