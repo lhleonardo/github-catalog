@@ -1,6 +1,5 @@
 import styled, { keyframes, css } from 'styled-components';
 
-
 export const Form = styled.form`
   margin-top: 30px;
   display: flex;
@@ -8,11 +7,12 @@ export const Form = styled.form`
 
   input {
     flex: 1;
-    border: 1px solid #eee;
+    border: 1px solid ${(props) => (props.error ? '#F00' : '#eee')};
 
     padding: 10px 15px;
     border-radius: 4px;
     font-size: 16px;
+    border-radius: 4px;
   }
 `;
 
@@ -63,11 +63,12 @@ export const List = styled.ul`
     display: flex;
     justify-content: space-between;
 
-    margin: 5px 0;
+    margin: 10px 0;
     padding: 5px 0;
 
     & + li {
       border-top: 1px solid #eee;
+      padding-top: 20px;
     }
 
     a {
