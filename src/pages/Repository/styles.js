@@ -56,6 +56,20 @@ export const IssueList = styled.ul`
   list-style: none;
 `;
 
+export const PageControl = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  button {
+    border-radius: 50%;
+    border: none;
+  }
+
+  button[disabled] {
+    opacity: 0.5;
+  }
+`;
+
 export const Issue = styled.li`
   display: flex;
   padding: 15px 10px;
