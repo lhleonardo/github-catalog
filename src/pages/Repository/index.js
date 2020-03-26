@@ -18,6 +18,28 @@ import {
 
 import Container from '../../components/Container';
 
+function extractPageInfo(issuesResponse) {
+  // <https://api.github.com/repositories/10270250/issues?page=1>; rel="prev",
+  // <https://api.github.com/repositories/10270250/issues?page=3>; rel="next",
+  // <https://api.github.com/repositories/10270250/issues?page=19>; rel="last",
+  // <https://api.github.com/repositories/10270250/issues?page=1>; rel="first"
+
+  const links = issuesResponse.headers.link.split(',');
+
+  const pagesData = {};
+
+  links.forEach((link) => {
+    const [linkData, rel] = link.split(';');
+    const url = new URL(linkData.match(/<([^)]+)>/)[1]);
+
+    pagesData[rel.match(/rel="([^)]+)"/)[1]] = Number(
+      url.searchParams.get('page'),
+    );
+  });
+
+  return pagesData;
+}
+
 function Repository({ match: { params } }) {
   const [repository, setRepository] = useState({});
   const [issues, setIssues] = useState([]);
@@ -26,28 +48,6 @@ function Repository({ match: { params } }) {
   const [pageInfo, setPageInfo] = useState({});
 
   const repoName = decodeURIComponent(params.repoName);
-
-  function extractPageInfo(issuesResponse) {
-    // <https://api.github.com/repositories/10270250/issues?page=1>; rel="prev",
-    // <https://api.github.com/repositories/10270250/issues?page=3>; rel="next",
-    // <https://api.github.com/repositories/10270250/issues?page=19>; rel="last",
-    // <https://api.github.com/repositories/10270250/issues?page=1>; rel="first"
-
-    const links = issuesResponse.headers.link.split(',');
-
-    const pagesData = {};
-
-    links.forEach((link) => {
-      const [linkData, rel] = link.split(';');
-      const url = new URL(linkData.match(/<([^)]+)>/)[1]);
-
-      pagesData[rel.match(/rel="([^)]+)"/)[1]] = Number(
-        url.searchParams.get('page'),
-      );
-    });
-
-    return pagesData;
-  }
 
   useEffect(() => {
     async function loadInfo() {
@@ -74,12 +74,7 @@ function Repository({ match: { params } }) {
     loadInfo();
   }, [repoName]);
 
-  useEffect(() => {
-    console.log(pageInfo);
-  }, [pageInfo]);
-
   async function changePage(nextPage) {
-    console.log(nextPage);
     const response = await api.get(`/repos/${repository.full_name}/issues`, {
       params: {
         page: nextPage,
@@ -108,23 +103,23 @@ function Repository({ match: { params } }) {
         <p>{repository.description}</p>
       </Owner>
 
-      <PageControl>
-        <button
-          disabled={!('prev' in pageInfo)}
-          type="button"
-          onClick={() => changePage(pageInfo.prev)}
-        >
-          <FaArrowCircleLeft color="#5960c1" size={25} />
-        </button>
-        <button
-          disabled={!('next' in pageInfo)}
-          type="button"
-          onClick={() => changePage(pageInfo.next)}
-        >
-          <FaArrowCircleRight color="#5960c1" size={25} />
-        </button>
-      </PageControl>
       <IssueList>
+        <PageControl>
+          <button
+            disabled={!('prev' in pageInfo)}
+            type="button"
+            onClick={() => changePage(pageInfo.prev)}
+          >
+            <FaArrowCircleLeft color="#5960c1" size={25} />
+          </button>
+          <button
+            disabled={!('next' in pageInfo)}
+            type="button"
+            onClick={() => changePage(pageInfo.next)}
+          >
+            <FaArrowCircleRight color="#5960c1" size={25} />
+          </button>
+        </PageControl>
         {issues.map((issue) => (
           <Issue key={String(issue.id)}>
             <img src={issue.user.avatar_url} alt={issue.user.login} />
